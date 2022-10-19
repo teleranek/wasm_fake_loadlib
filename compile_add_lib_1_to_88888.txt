@@ -1,0 +1,1 @@
+emcc add_lib_1_to_88888.cpp --no-entry -o add_lib_1_to_88888.wasm

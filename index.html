@@ -1,0 +1,78 @@
+<html>
+    <body>
+        <script type="text/javascript">
+            const dumbest = arg => 0;
+            const dummy = arg => {
+                debugger;
+                console.log(arg);
+            }
+            const memory = new WebAssembly.Memory({
+                initial: 256,
+                maximum: 256
+            });
+            const heap = new Uint8Array(memory.buffer);
+            const heap32 = new Uint32Array(memory.buffer);
+            const imports = {
+                memory,
+
+                // emscripten_memcpy_big: (dest, src, num) => {
+                //     heap.copyWithin(dest, src, src + num);
+                // },
+
+                // emscripten_resize_heap: (requestedSize) => {
+                //     return false; 
+                // },
+
+                // environ_sizes_get: (penviron_count, penviron_buf_size) => {
+                //     return 0;
+                // },
+
+                // environ_get: (environ, environ_buf) => {
+                //     return 0;
+                // },
+                // strftime_l: dumbest,
+
+                // fd_write: (fd, iov, iovcnt, pnum) => {
+                //     // hack to support printf in SYSCALLS_REQUIRE_FILESYSTEM=0
+                //     var num = 0;
+                //     for (var i = 0; i < iovcnt; i++) {
+                //         var ptr = heap32[((iov)>>2)];
+                //         var len = heap32[(((iov)+(4))>>2)];
+                //         iov += 8;
+                //         for (var j = 0; j < len; j++) {
+                //         printChar(fd, heap32[ptr+j]);
+                //         }
+                //         num += len;
+                //     }
+                //     heap32[((pnum)>>2)] = num;
+                //     return 0;
+                // },
+                // fd_seek: (fd, offset_low, offset_high, whence, newOffset) => {
+                //     return 70;
+                // },
+                // fd_read: dumbest,
+                // fd_close: dumbest,
+                proc_exit: ()=> console.log("exit called"),
+                abort: () => console.log("ABORT CALLED"),
+
+            };
+                // main: dummy,
+                // proc_exit: dummy,
+                // fd_seek: dummy
+            const importObject = { 
+                wasi_snapshot_preview1: imports,
+                env : imports
+            };
+
+            async function start() {
+                debugger;
+                var result;
+                result = await WebAssembly.instantiateStreaming(fetch("main.wasm"), importObject);
+                let funcResult = result.instance.exports.main();
+                console.log("RESULT IS:" + funcResult);
+            }
+
+            window.onload = start;
+        </script>
+    </body>
+</html>

@@ -1,0 +1,1 @@
+emcc main.cpp -sEXPORTED_FUNCTIONS=_main,addFunction -sASYNCIFY --bind -g -sALLOW_TABLE_GROWTH -sNO_EXIT_RUNTIME=1 -o main.html
